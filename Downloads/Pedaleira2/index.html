@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pedaleira online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <h1>Pedaleira online</h1>
+    <p>Ligue guitarra, baixo ou teclado numa placa de áudio e toque com efeitos direto no navegador.</p>
+  </header>
+
+  <main>
+    <section class="ligacao" aria-labelledby="tituloLigacao">
+      <h2 id="tituloLigacao">Ligação</h2>
+
+      <div class="grade-ligacao">
+        <div class="campo">
+          <label for="seletorEntrada">Entrada</label>
+          <select id="seletorEntrada">
+            <option value="">Padrão do sistema</option>
+          </select>
+          <button type="button" id="botaoDetectar" class="botao pequeno">Detectar entradas (P2 / fone)</button>
+          <p class="ajuda-campo">Violão no P2 do notebook: clique em detectar, permita o microfone e escolha a entrada marcada como P2 (geralmente "Headset" ou "Microfone externo"). Use o canal esquerdo.</p>
+        </div>
+
+        <div class="campo">
+          <label for="seletorCanal">Canal da placa</label>
+          <select id="seletorCanal">
+            <option value="esquerdo">Entrada 1 (esquerdo)</option>
+            <option value="direito">Entrada 2 (direito)</option>
+            <option value="ambos">As duas misturadas</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="seletorSaida">Saída</label>
+          <select id="seletorSaida">
+            <option value="">Padrão do sistema</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="ganhoEntrada">Ganho de entrada: <output id="saidaGanho" for="ganhoEntrada">0 dB</output></label>
+          <input type="range" id="ganhoEntrada" min="-20" max="30" step="1" value="0">
+        </div>
+
+        <div class="campo">
+          <label for="volumeSaida">Volume de saída: <output id="saidaVolume" for="volumeSaida">70%</output></label>
+          <input type="range" id="volumeSaida" min="0" max="100" step="1" value="70">
+        </div>
+      </div>
+
+      <div class="barra-ligacao">
+        <button type="button" id="botaoLigar" class="botao principal">Ligar áudio</button>
+        <div class="medidores" aria-hidden="true">
+          <div class="medidor-linha">
+            <span>Entrada</span>
+            <div class="medidor"><div id="barraEntrada" class="barra"></div></div>
+          </div>
+          <div class="medidor-linha">
+            <span>Saída</span>
+            <div class="medidor"><div id="barraSaida" class="barra"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <p id="mensagem" class="mensagem" role="status"></p>
+      <p class="aviso">Use fone de ouvido. Com caixa de som ao lado do microfone ou do instrumento, o som realimenta e vira apito. Comece com o volume de saída baixo.</p>
+    </section>
+
+    <section class="pedaleira" aria-labelledby="tituloPedaleira">
+      <div class="topo-pedaleira">
+        <h2 id="tituloPedaleira">Pedaleira</h2>
+        <div class="campo-inline">
+          <label for="seletorPredefinicao">Predefinição</label>
+          <select id="seletorPredefinicao">
+            <option value="personalizado">Personalizada</option>
+            <option value="limpo">Limpo</option>
+            <option value="blues">Blues</option>
+            <option value="rock">Rock</option>
+            <option value="ambiente">Ambiente</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="pedais" class="pedais"></div>
+      <p class="dica">Arraste um botão para cima ou para baixo, ou use as setas do teclado. Dois cliques voltam ao valor original. As setas no topo de cada pedal mudam a ordem da cadeia.</p>
+    </section>
+
+    <div class="duas-colunas">
+      <section aria-labelledby="tituloAfinador">
+        <h2 id="tituloAfinador">Afinador</h2>
+        <p>Toque uma nota e veja o quanto ela está acima ou abaixo do ponto certo.</p>
+        <button type="button" id="botaoAfinador" class="botao" aria-pressed="false" disabled>Ligar afinador</button>
+        <label class="marcador"><input type="checkbox" id="silenciarAfinando" checked> Silenciar a saída enquanto afina</label>
+
+        <div class="afinador">
+          <div id="notaAfinador" class="nota">—</div>
+          <div class="escala">
+            <div class="centro"></div>
+            <div id="agulha" class="agulha"></div>
+          </div>
+          <p id="detalheAfinador" class="detalhe">Sem sinal</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="tituloLatencia">
+        <h2 id="tituloLatencia">Latência</h2>
+        <dl class="informacoes">
+          <dt>Taxa de amostragem</dt>
+          <dd id="infoTaxa">—</dd>
+          <dt>Latência base do navegador</dt>
+          <dd id="infoBase">—</dd>
+          <dt>Latência de saída informada</dt>
+          <dd id="infoSaida">—</dd>
+          <dt>Canais da entrada</dt>
+          <dd id="infoCanais">—</dd>
+        </dl>
+
+        <h3>Medir o tempo de ida e volta</h3>
+        <p>Ligue a saída da placa na entrada com um cabo, com o volume baixo, ou aproxime a caixa de som do microfone. Pare de tocar e clique em medir. O teste envia 5 cliques e mede quanto cada um demora para voltar.</p>
+
+        <label for="sensibilidade">Limite de detecção: <output id="saidaSensibilidade" for="sensibilidade">0,10</output></label>
+        <input type="range" id="sensibilidade" min="0.02" max="0.5" step="0.01" value="0.1">
+
+        <button type="button" id="botaoMedir" class="botao" disabled>Medir latência</button>
+        <div id="resultadoLatencia" class="resultado" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="anuncio" class="so-leitor" aria-live="polite"></div>
+
+  <script src="efeitos.js"></script>
+  <script src="estado.js"></script>
+  <script src="motor.js"></script>
+  <script src="afinador.js"></script>
+  <script src="interface.js"></script>
+</body>
+</html>
